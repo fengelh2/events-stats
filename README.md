@@ -1,0 +1,32 @@
+# events-stats
+
+Single-page unified analytics dashboard for [events-hk](https://github.com/fengelh2/events-hk), [events-la](https://github.com/fengelh2/events-la), [events-nrw](https://github.com/fengelh2/events-nrw), and [events-singa](https://github.com/fengelh2/events-singa).
+
+**Live:** https://fengelh2.github.io/events-stats/
+
+## One-time setup
+
+1. Sign up at https://www.goatcounter.com/signup (free, no credit card).
+2. Create four sites with codes (the subdomain): `events-hk`, `events-la`, `events-nrw`, `events-singa`.
+3. For each site → **Settings → Site → Access → "Allow access to all"** (so the public stats endpoints work without an API token).
+
+That's it. The four events sites already include the GoatCounter `<script>` tag, so as soon as a site receives its first visit, stats appear in this dashboard.
+
+## What it shows
+
+Per site, for any of: today / 7d / 30d / 90d / 12 months:
+- Unique visitors
+- Pageviews
+- Event clicks (which event rows users opened)
+- Mobile vs desktop split (derived from screen sizes)
+- Top pages
+- Top **event clicks** (which specific events got clicked — most useful signal)
+- Where visitors came from (referrers — WhatsApp, Google, direct, etc.)
+- Top countries
+- Top browsers
+
+Plus a side-by-side comparison bar of unique visitors across the four sites.
+
+## Privacy
+
+GoatCounter is cookie-free and GDPR-friendly by default — no banner needed.

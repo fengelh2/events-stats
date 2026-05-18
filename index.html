@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Events sites — unified stats</title>
+<style>
+  :root {
+    --bg:#fafafa; --fg:#181818; --muted:#666; --card:#fff; --line:#e5e5e5;
+    --accent:#0a8a72; --accent-soft:rgba(10,138,114,0.08);
+    --hk:#962d3e; --la:#1f6f8b; --nrw:#b8860b; --singa:#0a8a72;
+  }
+  @media (prefers-color-scheme:dark){
+    :root {--bg:#161616;--fg:#f5f5f5;--muted:#aaa;--card:#1f1f1f;--line:#333;--accent-soft:rgba(10,138,114,0.18);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 24px;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+  .wrap{max-width:1400px;margin:0 auto}
+  h1{font-size:28px;margin:0 0 8px}
+  .sub{color:var(--muted);margin-bottom:24px;font-size:13px}
+  .range-toggle{display:inline-flex;gap:0;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:24px;overflow:hidden}
+  .range-toggle button{appearance:none;background:none;color:var(--fg);border:none;padding:8px 16px;cursor:pointer;font:inherit;border-right:1px solid var(--line)}
+  .range-toggle button:last-child{border-right:none}
+  .range-toggle button.on{background:var(--accent);color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+  .card-head h2{font-size:16px;margin:0;font-weight:600}
+  .site-pill{font-size:11px;padding:2px 8px;border-radius:999px;color:#fff;font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+  .site-pill.hk{background:var(--hk)}
+  .site-pill.la{background:var(--la)}
+  .site-pill.nrw{background:var(--nrw)}
+  .site-pill.singa{background:var(--singa)}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .stat{padding:10px;background:var(--accent-soft);border-radius:8px}
+  .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px}
+  .stat-num{font-size:22px;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  table th, table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  table th{font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
+  table tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .bar{display:inline-block;height:6px;background:var(--accent);border-radius:3px;vertical-align:middle;margin-right:6px}
+  .section-h{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px}
+  .row-narrow td{padding:4px 8px}
+  .err{color:#d22;font-size:12px;padding:8px;background:rgba(210,34,34,0.07);border-radius:6px}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .heatmap{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin-top:6px}
+  .heatmap div{height:18px;border-radius:2px;background:var(--accent-soft)}
+  .heat-axis{display:grid;grid-template-columns:repeat(24,1fr);font-size:9px;color:var(--muted);text-align:center;margin-top:2px}
+  .compare-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:24px}
+  .compare-card h2{font-size:16px;margin:0 0 14px}
+  .compare-row{display:grid;grid-template-columns:120px 1fr 80px;gap:12px;align-items:center;margin:6px 0}
+  .compare-bar{height:18px;background:var(--accent);border-radius:4px;min-width:2px}
+  .compare-row.hk .compare-bar{background:var(--hk)}
+  .compare-row.la .compare-bar{background:var(--la)}
+  .compare-row.nrw .compare-bar{background:var(--nrw)}
+  .compare-row.singa .compare-bar{background:var(--singa)}
+  .setup-banner{background:#fff8e1;border:1px solid #f4d03f;color:#7a5a02;padding:14px;border-radius:8px;margin-bottom:24px;font-size:13px}
+  @media (prefers-color-scheme:dark){.setup-banner{background:rgba(244,208,63,0.1);color:#f4d03f}}
+  .setup-banner code{background:rgba(0,0,0,0.1);padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Events sites — unified stats</h1>
+  <p class="sub">Aggregating GoatCounter analytics from <strong>events-hk</strong>, <strong>events-la</strong>, <strong>events-nrw</strong>, <strong>events-singa</strong>. Auto-refreshes when you switch range.</p>
+
+  <div id="setup" class="setup-banner" hidden>
+    <strong>One-time setup needed.</strong> Sign up at <a href="https://www.goatcounter.com/signup" target="_blank" rel="noopener">goatcounter.com/signup</a>, then create 4 sites with codes
+    <code>events-hk</code>, <code>events-la</code>, <code>events-nrw</code>, <code>events-singa</code>.
+    In each site → <em>Settings → Site → Allow access to all (public statistics)</em>. Stats start flowing the moment a site gets its first visit.
+  </div>
+
+  <div class="range-toggle" role="tablist" aria-label="Date range">
+    <button data-range="day" class="on">Today</button>
+    <button data-range="week">7 days</button>
+    <button data-range="month">30 days</button>
+    <button data-range="quarter">90 days</button>
+    <button data-range="year">12 months</button>
+  </div>
+
+  <div class="compare-card">
+    <h2>Visitors across sites</h2>
+    <div id="compare-visitors"></div>
+  </div>
+
+  <div class="grid" id="cards"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// Config: one entry per events site. GoatCounter must have "Allow access to
+// all (public statistics)" enabled per-site.
+// ─────────────────────────────────────────────────────────────────────────
+const SITES = [
+  {code:"events-hk",    name:"events-hk",    pill:"hk",    flag:"🇭🇰", site:"https://fengelh2.github.io/events-hk/"},
+  {code:"events-la",    name:"events-la",    pill:"la",    flag:"🇺🇸", site:"https://fengelh2.github.io/events-la/"},
+  {code:"events-nrw",   name:"events-nrw",   pill:"nrw",   flag:"🇩🇪", site:"https://fengelh2.github.io/events-nrw/"},
+  {code:"events-singa", name:"events-singa", pill:"singa", flag:"🇸🇬", site:"https://fengelh2.github.io/events-singa/"},
+];
+
+// GoatCounter public endpoints — no auth needed once site is public.
+//   /counter/TOTAL.json                         → total views/visitors
+//   /counter/TOTAL.json?period=day              → today
+//   /counter/TOTAL.json?start=YYYY-MM-DD&end=…  → date range
+//   /counter//pages.json                        → top paths
+//   /counter//refs.json                         → top referrers
+//   /counter//browsers.json                     → top browsers
+//   /counter//systems.json                      → top OS
+//   /counter//sizes.json                        → screen sizes (mobile vs desktop)
+//   /counter//locations.json                    → top countries
+const ENDPOINTS = ["total","pages","refs","browsers","systems","sizes","locations","toprefs"];
+
+let currentRange = "day";
+
+function dateRange(range){
+  const end = new Date();
+  const start = new Date();
+  if(range==="day"){ /* same day */ }
+  else if(range==="week")    start.setDate(end.getDate()-6);
+  else if(range==="month")   start.setDate(end.getDate()-29);
+  else if(range==="quarter") start.setDate(end.getDate()-89);
+  else if(range==="year")    start.setFullYear(end.getFullYear()-1);
+  const iso = d => d.toISOString().slice(0,10);
+  return {start:iso(start), end:iso(end)};
+}
+
+async function fetchSite(site, range){
+  const {start, end} = dateRange(range);
+  const qs = `?start=${start}&end=${end}`;
+  const base = `https://${site.code}.goatcounter.com/counter/`;
+  const out = {site, range, error:null};
+  try {
+    const [total, pages, refs, browsers, systems, sizes, locations] = await Promise.all([
+      fetch(base+`TOTAL.json${qs}`).then(r=>r.ok?r.json():Promise.reject(r.status)),
+      fetch(base+`pages.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(base+`refs.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(base+`browsers.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(base+`systems.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(base+`sizes.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(base+`locations.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+    ]);
+    out.total = total;
+    out.pages = pages;
+    out.refs = refs;
+    out.browsers = browsers;
+    out.systems = systems;
+    out.sizes = sizes;
+    out.locations = locations;
+  } catch(err) {
+    out.error = err;
+  }
+  return out;
+}
+
+function topRows(items, key, limit=5){
+  if(!items || !Array.isArray(items)) return "";
+  const total = items.reduce((s,it)=>s+(it.count||0),0) || 1;
+  return items.slice(0,limit).map(it=>{
+    const pct = Math.round(100*(it.count||0)/total);
+    const label = (it[key]||it.name||"–").toString().slice(0,40);
+    return `<tr><td><span class="bar" style="width:${pct/2}px"></span>${escape(label)}</td><td class="num">${(it.count||0).toLocaleString()}</td></tr>`;
+  }).join("");
+}
+
+function escape(s){ return (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+function mobileSplit(sizes){
+  // GoatCounter size buckets: phones ≤ ~480, tablets ≤ ~1024, desktop > 1024
+  if(!sizes || !Array.isArray(sizes)) return null;
+  let phone=0, tablet=0, desktop=0;
+  for(const it of sizes){
+    const w = parseInt((it.name||it.id||"0").split(/[x×]/)[0],10) || 0;
+    const n = it.count||0;
+    if(w<=480) phone+=n;
+    else if(w<=1024) tablet+=n;
+    else desktop+=n;
+  }
+  const tot = phone+tablet+desktop || 1;
+  return {phone, tablet, desktop, pctPhone:Math.round(100*phone/tot), pctDesktop:Math.round(100*desktop/tot)};
+}
+
+function renderCard(d){
+  const tot = (d.total && d.total.total) || 0;
+  const uniq = (d.total && d.total.total_unique) || 0;
+  const events = (d.total && d.total.events) || 0;
+  const split = mobileSplit(d.sizes);
+  const err = d.error ? `<div class="err">No data yet (${d.error}). Site must be public in GoatCounter settings, and have ≥1 visit.</div>` : "";
+  return `
+    <div class="card">
+      <div class="card-head">
+        <h2>${d.site.flag} ${escape(d.site.name)}</h2>
+        <span class="site-pill ${d.site.pill}">${currentRange}</span>
+      </div>
+      ${err}
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Visitors</div><div class="stat-num">${uniq.toLocaleString()}</div></div>
+        <div class="stat"><div class="stat-label">Pageviews</div><div class="stat-num">${tot.toLocaleString()}</div></div>
+        <div class="stat"><div class="stat-label">Event clicks</div><div class="stat-num">${events.toLocaleString()}</div></div>
+        <div class="stat"><div class="stat-label">Mobile / Desktop</div><div class="stat-num" style="font-size:15px">${split?`${split.pctPhone}% / ${split.pctDesktop}%`:"–"}</div></div>
+      </div>
+
+      <div class="section-h">Top pages</div>
+      <table class="row-narrow"><tbody>${topRows(d.pages, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
+
+      <div class="section-h">Top event clicks</div>
+      <table class="row-narrow"><tbody>${topEventClicks(d.pages) || `<tr><td colspan="2" style="color:var(--muted)">none yet</td></tr>`}</tbody></table>
+
+      <div class="section-h">Where from</div>
+      <table class="row-narrow"><tbody>${topRows(d.refs, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
+
+      <div class="section-h">Top countries</div>
+      <table class="row-narrow"><tbody>${topRows(d.locations, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
+
+      <div class="section-h">Browsers</div>
+      <table class="row-narrow"><tbody>${topRows(d.browsers, "name", 3) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
+    </div>`;
+}
+
+function topEventClicks(pages){
+  // event-click/<venue>/<title> rows are what our renderer pushes via goatcounter.count
+  if(!pages || !Array.isArray(pages)) return "";
+  const evs = pages.filter(p => (p.name||"").startsWith("event-click/"));
+  if(!evs.length) return "";
+  return evs.slice(0,5).map(p=>{
+    const parts = (p.name||"").split("/").slice(1);
+    const venue = parts[0]||"?";
+    const title = parts.slice(1).join("/").slice(0,50);
+    return `<tr><td><span style="color:var(--muted)">${escape(venue)}</span> ${escape(title)}</td><td class="num">${(p.count||0).toLocaleString()}</td></tr>`;
+  }).join("");
+}
+
+function renderCompare(results){
+  const data = results.map(r=>({site:r.site, uniq:(r.total&&r.total.total_unique)||0})).sort((a,b)=>b.uniq-a.uniq);
+  const max = Math.max(...data.map(d=>d.uniq), 1);
+  return data.map(d=>`
+    <div class="compare-row ${d.site.pill}">
+      <div>${d.site.flag} ${escape(d.site.name)}</div>
+      <div><div class="compare-bar" style="width:${Math.max(2,100*d.uniq/max)}%"></div></div>
+      <div class="num">${d.uniq.toLocaleString()}</div>
+    </div>`).join("");
+}
+
+async function refresh(){
+  document.getElementById("cards").innerHTML = `<div class="card"><em>Loading…</em></div>`;
+  const results = await Promise.all(SITES.map(s=>fetchSite(s, currentRange)));
+  const anyErr = results.every(r=>r.error);
+  document.getElementById("setup").hidden = !anyErr;
+  document.getElementById("compare-visitors").innerHTML = renderCompare(results);
+  document.getElementById("cards").innerHTML = results.map(renderCard).join("");
+}
+
+document.querySelectorAll(".range-toggle button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".range-toggle button").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on");
+    currentRange = btn.dataset.range;
+    refresh();
+  });
+});
+
+refresh();
+</script>
+</body>
+</html>
