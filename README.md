@@ -1,6 +1,6 @@
 # events-stats
 
-Single-page unified analytics dashboard for [events-hk](https://github.com/fengelh2/events-hk), [events-la](https://github.com/fengelh2/events-la), [events-nrw](https://github.com/fengelh2/events-nrw), and [events-singa](https://github.com/fengelh2/events-singa).
+Single-page unified analytics dashboard for the four city pages of [fengelh2/events](https://github.com/fengelh2/events) — Hong Kong, Los Angeles, NRW, and Singapore.
 
 **Live:** https://fengelh2.github.io/events-stats/
 
@@ -10,7 +10,7 @@ Single-page unified analytics dashboard for [events-hk](https://github.com/fenge
 2. Create four sites with codes (the subdomain): `events-hk`, `events-la`, `events-nrw`, `events-singa`.
 3. For each site → **Settings → Site → Access → "Allow access to all"** (so the public stats endpoints work without an API token).
 
-That's it. The four events sites already include the GoatCounter `<script>` tag, so as soon as a site receives its first visit, stats appear in this dashboard.
+That's it. The four city pages (`/events/hk/`, `/events/la/`, `/events/nrw/`, `/events/singa/`) already include the GoatCounter `<script>` tag, so as soon as a page receives its first visit, stats appear in this dashboard.
 
 ## What it shows
 
