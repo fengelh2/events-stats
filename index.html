@@ -94,10 +94,10 @@
 // all (public statistics)" enabled per-site.
 // ─────────────────────────────────────────────────────────────────────────
 const SITES = [
-  {code:"events-hk",    name:"events-hk",    pill:"hk",    flag:"🇭🇰", site:"https://fengelh2.github.io/events-hk/"},
-  {code:"events-la",    name:"events-la",    pill:"la",    flag:"🇺🇸", site:"https://fengelh2.github.io/events-la/"},
-  {code:"events-nrw",   name:"events-nrw",   pill:"nrw",   flag:"🇩🇪", site:"https://fengelh2.github.io/events-nrw/"},
-  {code:"events-singa", name:"events-singa", pill:"singa", flag:"🇸🇬", site:"https://fengelh2.github.io/events-singa/"},
+  {code:"events-hk",    name:"Hong Kong",    pill:"hk",    flag:"🇨🇳", site:"https://fengelh2.github.io/events/hk/"},
+  {code:"events-la",    name:"Los Angeles",  pill:"la",    flag:"🇺🇸", site:"https://fengelh2.github.io/events/la/"},
+  {code:"events-nrw",   name:"NRW",          pill:"nrw",   flag:"🇩🇪", site:"https://fengelh2.github.io/events/nrw/"},
+  {code:"events-singa", name:"Singapore",    pill:"singa", flag:"🇸🇬", site:"https://fengelh2.github.io/events/singa/"},
 ];
 
 // GoatCounter public endpoints — no auth needed once site is public.
@@ -190,7 +190,7 @@ function renderCard(d){
   return `
     <div class="card">
       <div class="card-head">
-        <h2>${d.site.flag} ${escape(d.site.name)}</h2>
+        <h2><a href="${d.site.site}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${d.site.flag} ${escape(d.site.name)} ↗</a></h2>
         <span class="site-pill ${d.site.pill}">${currentRange}</span>
       </div>
       ${err}
