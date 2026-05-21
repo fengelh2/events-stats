@@ -67,9 +67,8 @@
   <p class="sub">Aggregating GoatCounter analytics from <strong>events-hk</strong>, <strong>events-la</strong>, <strong>events-nrw</strong>, <strong>events-singa</strong>. Auto-refreshes when you switch range.</p>
 
   <div id="setup" class="setup-banner" hidden>
-    <strong>One-time setup needed.</strong> Sign up at <a href="https://www.goatcounter.com/signup" target="_blank" rel="noopener">goatcounter.com/signup</a>, then create 4 sites with codes
-    <code>events-hk</code>, <code>events-la</code>, <code>events-nrw</code>, <code>events-singa</code>.
-    In each site → <em>Settings → Site → Allow access to all (public statistics)</em>. Stats start flowing the moment a site gets its first visit.
+    <strong>One-time setup needed.</strong> Sign up at <a href="https://www.goatcounter.com/signup" target="_blank" rel="noopener">goatcounter.com/signup</a> and create <strong>one site</strong> with the code <code>events</code> (subdomain becomes <code>events.goatcounter.com</code>).
+    Then in <em>Settings → Site → Allow access to all (public statistics)</em>. Stats flow as soon as the next visit hits any of the four city pages.
   </div>
 
   <div class="range-toggle" role="tablist" aria-label="Date range">
@@ -93,24 +92,15 @@
 // Config: one entry per events site. GoatCounter must have "Allow access to
 // all (public statistics)" enabled per-site.
 // ─────────────────────────────────────────────────────────────────────────
-const SITES = [
-  {code:"events-hk",    name:"Hong Kong",    pill:"hk",    flag:"🇨🇳", site:"https://fengelh2.github.io/events/hk/"},
-  {code:"events-la",    name:"Los Angeles",  pill:"la",    flag:"🇺🇸", site:"https://fengelh2.github.io/events/la/"},
-  {code:"events-nrw",   name:"NRW",          pill:"nrw",   flag:"🇩🇪", site:"https://fengelh2.github.io/events/nrw/"},
-  {code:"events-singa", name:"Singapore",    pill:"singa", flag:"🇸🇬", site:"https://fengelh2.github.io/events/singa/"},
-];
+// ONE GoatCounter site for everything — per-city stats come from path filters.
+const GC = "https://events.goatcounter.com";
 
-// GoatCounter public endpoints — no auth needed once site is public.
-//   /counter/TOTAL.json                         → total views/visitors
-//   /counter/TOTAL.json?period=day              → today
-//   /counter/TOTAL.json?start=YYYY-MM-DD&end=…  → date range
-//   /counter//pages.json                        → top paths
-//   /counter//refs.json                         → top referrers
-//   /counter//browsers.json                     → top browsers
-//   /counter//systems.json                      → top OS
-//   /counter//sizes.json                        → screen sizes (mobile vs desktop)
-//   /counter//locations.json                    → top countries
-const ENDPOINTS = ["total","pages","refs","browsers","systems","sizes","locations","toprefs"];
+const SITES = [
+  {code:"hk",    name:"Hong Kong",    pill:"hk",    flag:"🇨🇳", path:"/events/hk/",    site:"https://fengelh2.github.io/events/hk/"},
+  {code:"la",    name:"Los Angeles",  pill:"la",    flag:"🇺🇸", path:"/events/la/",    site:"https://fengelh2.github.io/events/la/"},
+  {code:"nrw",   name:"NRW",          pill:"nrw",   flag:"🇩🇪", path:"/events/nrw/",   site:"https://fengelh2.github.io/events/nrw/"},
+  {code:"singa", name:"Singapore",    pill:"singa", flag:"🇸🇬", path:"/events/singa/", site:"https://fengelh2.github.io/events/singa/"},
+];
 
 let currentRange = "day";
 
@@ -126,31 +116,40 @@ function dateRange(range){
   return {start:iso(start), end:iso(end)};
 }
 
-async function fetchSite(site, range){
+// Fetch all-paths data from the one GoatCounter site, then bucketize per-city.
+async function fetchAll(range){
   const {start, end} = dateRange(range);
   const qs = `?start=${start}&end=${end}`;
-  const base = `https://${site.code}.goatcounter.com/counter/`;
-  const out = {site, range, error:null};
+  const out = {error:null, pages:null, refs:null, browsers:null, sizes:null, locations:null, total:null};
   try {
-    const [total, pages, refs, browsers, systems, sizes, locations] = await Promise.all([
-      fetch(base+`TOTAL.json${qs}`).then(r=>r.ok?r.json():Promise.reject(r.status)),
-      fetch(base+`pages.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(base+`refs.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(base+`browsers.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(base+`systems.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(base+`sizes.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(base+`locations.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+    const [total, pages, refs, browsers, sizes, locations] = await Promise.all([
+      fetch(`${GC}/counter/TOTAL.json${qs}`).then(r=>r.ok?r.json():Promise.reject(r.status)),
+      fetch(`${GC}/counter//pages.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(`${GC}/counter//refs.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(`${GC}/counter//browsers.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(`${GC}/counter//sizes.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(`${GC}/counter//locations.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
     ]);
-    out.total = total;
-    out.pages = pages;
-    out.refs = refs;
-    out.browsers = browsers;
-    out.systems = systems;
-    out.sizes = sizes;
-    out.locations = locations;
-  } catch(err) {
-    out.error = err;
-  }
+    out.total = total; out.pages = pages; out.refs = refs;
+    out.browsers = browsers; out.sizes = sizes; out.locations = locations;
+  } catch(err) { out.error = err; }
+  return out;
+}
+
+// Slice the global data into per-city buckets via path prefix matching.
+function bucketize(all, site){
+  if(all.error) return {site, range:currentRange, error:all.error};
+  const out = {site, range:currentRange, error:null};
+  const isCityPath = p => (p.name||"").startsWith(site.path);
+  const isCityClick = p => (p.name||"").startsWith(`event-click/${site.code}/`);
+  out.pages = (all.pages||[]).filter(p => isCityPath(p) || isCityClick(p));
+  // Per-city pageview count = sum of all paths under this city's prefix
+  // (excluding event-click which are GoatCounter "events" not pageviews)
+  const pv = (all.pages||[]).filter(isCityPath).reduce((s,p)=>s+(p.count||0),0);
+  const clicks = (all.pages||[]).filter(isCityClick).reduce((s,p)=>s+(p.count||0),0);
+  out.total = {total: pv, total_unique: pv, events: clicks};
+  out.refs = all.refs; out.browsers = all.browsers;
+  out.sizes = all.sizes; out.locations = all.locations;
   return out;
 }
 
@@ -219,14 +218,14 @@ function renderCard(d){
 }
 
 function topEventClicks(pages){
-  // event-click/<venue>/<title> rows are what our renderer pushes via goatcounter.count
+  // event-click/<city>/<venue>/<title> rows pushed by renderer's click handler
   if(!pages || !Array.isArray(pages)) return "";
   const evs = pages.filter(p => (p.name||"").startsWith("event-click/"));
   if(!evs.length) return "";
   return evs.slice(0,5).map(p=>{
-    const parts = (p.name||"").split("/").slice(1);
-    const venue = parts[0]||"?";
-    const title = parts.slice(1).join("/").slice(0,50);
+    const parts = (p.name||"").split("/").slice(1); // [city, venue, title...]
+    const venue = parts[1]||"?";
+    const title = parts.slice(2).join("/").slice(0,50);
     return `<tr><td><span style="color:var(--muted)">${escape(venue)}</span> ${escape(title)}</td><td class="num">${(p.count||0).toLocaleString()}</td></tr>`;
   }).join("");
 }
@@ -244,9 +243,9 @@ function renderCompare(results){
 
 async function refresh(){
   document.getElementById("cards").innerHTML = `<div class="card"><em>Loading…</em></div>`;
-  const results = await Promise.all(SITES.map(s=>fetchSite(s, currentRange)));
-  const anyErr = results.every(r=>r.error);
-  document.getElementById("setup").hidden = !anyErr;
+  const all = await fetchAll(currentRange);
+  const results = SITES.map(s => bucketize(all, s));
+  document.getElementById("setup").hidden = !all.error;
   document.getElementById("compare-visitors").innerHTML = renderCompare(results);
   document.getElementById("cards").innerHTML = results.map(renderCard).join("");
 }
