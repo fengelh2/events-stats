@@ -67,8 +67,7 @@
   <p class="sub">Aggregating GoatCounter analytics from <strong>events-hk</strong>, <strong>events-la</strong>, <strong>events-nrw</strong>, <strong>events-singa</strong>. Auto-refreshes when you switch range.</p>
 
   <div id="setup" class="setup-banner" hidden>
-    <strong>One-time setup needed.</strong> Sign up at <a href="https://www.goatcounter.com/signup" target="_blank" rel="noopener">goatcounter.com/signup</a> and create <strong>one site</strong> with the code <code>events</code> (subdomain becomes <code>events.goatcounter.com</code>).
-    Then in <em>Settings → Site → Allow access to all (public statistics)</em>. Stats flow as soon as the next visit hits any of the four city pages.
+    <strong>Public stats not enabled yet.</strong> In your GoatCounter dashboard (<code>fengelh.goatcounter.com</code>) go to <em>Settings → Site → Access</em> and toggle on <strong>"Allow access to all"</strong>. Stats then flow as soon as the next visit hits any city page.
   </div>
 
   <div class="range-toggle" role="tablist" aria-label="Date range">
@@ -93,7 +92,7 @@
 // all (public statistics)" enabled per-site.
 // ─────────────────────────────────────────────────────────────────────────
 // ONE GoatCounter site for everything — per-city stats come from path filters.
-const GC = "https://events.goatcounter.com";
+const GC = "https://fengelh.goatcounter.com";
 
 const SITES = [
   {code:"hk",    name:"Hong Kong",    pill:"hk",    flag:"🇨🇳", path:"/events/hk/",    site:"https://fengelh2.github.io/events/hk/"},

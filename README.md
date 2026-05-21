@@ -7,7 +7,7 @@ Single-page unified analytics dashboard for the four city pages of [fengelh2/eve
 ## One-time setup
 
 1. Sign up at https://www.goatcounter.com/signup (free, no credit card).
-2. Create **one site** with code `events` (subdomain becomes `events.goatcounter.com`).
+2. The default site uses your username as the subdomain (currently `fengelh.goatcounter.com`).
 3. Go to **Settings → Site → Access → "Allow access to all"** (so the public stats endpoints work without an API token).
 
 That's it. All four city pages (`/events/hk/`, `/events/la/`, `/events/nrw/`, `/events/singa/`) post to the same GoatCounter site; the dashboard splits per-city by URL path prefix.
