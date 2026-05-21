@@ -115,41 +115,35 @@ function dateRange(range){
   return {start:iso(start), end:iso(end)};
 }
 
-// Fetch all-paths data from the one GoatCounter site, then bucketize per-city.
-async function fetchAll(range){
+// GoatCounter public stats expose only per-path counter endpoints.
+// (Top-pages, referrers, browsers, etc. need an API token — not usable
+// from client-side JS without leaking the token. The native dashboard at
+// fengelh.goatcounter.com handles those — we link to it.)
+async function fetchCity(site, range){
   const {start, end} = dateRange(range);
   const qs = `?start=${start}&end=${end}`;
-  const out = {error:null, pages:null, refs:null, browsers:null, sizes:null, locations:null, total:null};
+  // Encode the path with %2F slashes
+  const enc = encodeURIComponent(site.path);
+  const out = {site, range, error:null, total:null, eventClicks:0};
   try {
-    const [total, pages, refs, browsers, sizes, locations] = await Promise.all([
-      fetch(`${GC}/counter/TOTAL.json${qs}`).then(r=>r.ok?r.json():Promise.reject(r.status)),
-      fetch(`${GC}/counter//pages.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(`${GC}/counter//refs.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(`${GC}/counter//browsers.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(`${GC}/counter//sizes.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-      fetch(`${GC}/counter//locations.json${qs}`).then(r=>r.ok?r.json():null).catch(()=>null),
-    ]);
-    out.total = total; out.pages = pages; out.refs = refs;
-    out.browsers = browsers; out.sizes = sizes; out.locations = locations;
+    const r = await fetch(`${GC}/counter/${enc}.json${qs}`);
+    if(!r.ok) throw r.status;
+    out.total = await r.json();
+    // Event clicks aren't trivially queryable per-city via public API.
+    // Aggregate event-click/<city>/* counts require listing paths.
+    // Skipped here; user sees them in the native dashboard.
   } catch(err) { out.error = err; }
   return out;
 }
 
-// Slice the global data into per-city buckets via path prefix matching.
-function bucketize(all, site){
-  if(all.error) return {site, range:currentRange, error:all.error};
-  const out = {site, range:currentRange, error:null};
-  const isCityPath = p => (p.name||"").startsWith(site.path);
-  const isCityClick = p => (p.name||"").startsWith(`event-click/${site.code}/`);
-  out.pages = (all.pages||[]).filter(p => isCityPath(p) || isCityClick(p));
-  // Per-city pageview count = sum of all paths under this city's prefix
-  // (excluding event-click which are GoatCounter "events" not pageviews)
-  const pv = (all.pages||[]).filter(isCityPath).reduce((s,p)=>s+(p.count||0),0);
-  const clicks = (all.pages||[]).filter(isCityClick).reduce((s,p)=>s+(p.count||0),0);
-  out.total = {total: pv, total_unique: pv, events: clicks};
-  out.refs = all.refs; out.browsers = all.browsers;
-  out.sizes = all.sizes; out.locations = all.locations;
-  return out;
+async function fetchTotal(range){
+  const {start, end} = dateRange(range);
+  const qs = `?start=${start}&end=${end}`;
+  try {
+    const r = await fetch(`${GC}/counter/TOTAL.json${qs}`);
+    if(r.ok) return await r.json();
+  } catch {}
+  return null;
 }
 
 function topRows(items, key, limit=5){
@@ -180,11 +174,9 @@ function mobileSplit(sizes){
 }
 
 function renderCard(d){
-  const tot = (d.total && d.total.total) || 0;
-  const uniq = (d.total && d.total.total_unique) || 0;
-  const events = (d.total && d.total.events) || 0;
-  const split = mobileSplit(d.sizes);
-  const err = d.error ? `<div class="err">No data yet (${d.error}). Site must be public in GoatCounter settings, and have ≥1 visit.</div>` : "";
+  const tot = parseInt((d.total && d.total.count) || 0, 10);
+  const uniq = parseInt((d.total && d.total.count_unique) || 0, 10);
+  const err = d.error ? `<div class="err">No data (${d.error}).</div>` : "";
   return `
     <div class="card">
       <div class="card-head">
@@ -193,46 +185,19 @@ function renderCard(d){
       </div>
       ${err}
       <div class="stat-grid">
-        <div class="stat"><div class="stat-label">Visitors</div><div class="stat-num">${uniq.toLocaleString()}</div></div>
         <div class="stat"><div class="stat-label">Pageviews</div><div class="stat-num">${tot.toLocaleString()}</div></div>
-        <div class="stat"><div class="stat-label">Event clicks</div><div class="stat-num">${events.toLocaleString()}</div></div>
-        <div class="stat"><div class="stat-label">Mobile / Desktop</div><div class="stat-num" style="font-size:15px">${split?`${split.pctPhone}% / ${split.pctDesktop}%`:"–"}</div></div>
+        <div class="stat"><div class="stat-label">Unique visitors</div><div class="stat-num">${uniq.toLocaleString()}</div></div>
       </div>
-
-      <div class="section-h">Top pages</div>
-      <table class="row-narrow"><tbody>${topRows(d.pages, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
-
-      <div class="section-h">Top event clicks</div>
-      <table class="row-narrow"><tbody>${topEventClicks(d.pages) || `<tr><td colspan="2" style="color:var(--muted)">none yet</td></tr>`}</tbody></table>
-
-      <div class="section-h">Where from</div>
-      <table class="row-narrow"><tbody>${topRows(d.refs, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
-
-      <div class="section-h">Top countries</div>
-      <table class="row-narrow"><tbody>${topRows(d.locations, "name", 5) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
-
-      <div class="section-h">Browsers</div>
-      <table class="row-narrow"><tbody>${topRows(d.browsers, "name", 3) || `<tr><td colspan="2" style="color:var(--muted)">–</td></tr>`}</tbody></table>
+      <p class="hint">For top pages, event clicks, referrers, browsers and countries → <a href="https://fengelh.goatcounter.com/?filter=${encodeURIComponent(d.site.path)}" target="_blank" rel="noopener">view in GoatCounter</a></p>
     </div>`;
 }
 
-function topEventClicks(pages){
-  // event-click/<city>/<venue>/<title> rows pushed by renderer's click handler
-  if(!pages || !Array.isArray(pages)) return "";
-  const evs = pages.filter(p => (p.name||"").startsWith("event-click/"));
-  if(!evs.length) return "";
-  return evs.slice(0,5).map(p=>{
-    const parts = (p.name||"").split("/").slice(1); // [city, venue, title...]
-    const venue = parts[1]||"?";
-    const title = parts.slice(2).join("/").slice(0,50);
-    return `<tr><td><span style="color:var(--muted)">${escape(venue)}</span> ${escape(title)}</td><td class="num">${(p.count||0).toLocaleString()}</td></tr>`;
-  }).join("");
-}
-
-function renderCompare(results){
-  const data = results.map(r=>({site:r.site, uniq:(r.total&&r.total.total_unique)||0})).sort((a,b)=>b.uniq-a.uniq);
+function renderCompare(results, total){
+  const data = results.map(r=>({site:r.site, uniq:parseInt((r.total&&r.total.count_unique)||0,10)})).sort((a,b)=>b.uniq-a.uniq);
   const max = Math.max(...data.map(d=>d.uniq), 1);
-  return data.map(d=>`
+  const tot = total ? parseInt(total.count_unique||0,10) : 0;
+  const head = tot > 0 ? `<p class="hint" style="margin-bottom:14px">Total unique visitors across all cities: <strong>${tot.toLocaleString()}</strong></p>` : "";
+  return head + data.map(d=>`
     <div class="compare-row ${d.site.pill}">
       <div>${d.site.flag} ${escape(d.site.name)}</div>
       <div><div class="compare-bar" style="width:${Math.max(2,100*d.uniq/max)}%"></div></div>
@@ -242,10 +207,13 @@ function renderCompare(results){
 
 async function refresh(){
   document.getElementById("cards").innerHTML = `<div class="card"><em>Loading…</em></div>`;
-  const all = await fetchAll(currentRange);
-  const results = SITES.map(s => bucketize(all, s));
-  document.getElementById("setup").hidden = !all.error;
-  document.getElementById("compare-visitors").innerHTML = renderCompare(results);
+  const [results, total] = await Promise.all([
+    Promise.all(SITES.map(s => fetchCity(s, currentRange))),
+    fetchTotal(currentRange),
+  ]);
+  const anyErr = results.every(r=>r.error);
+  document.getElementById("setup").hidden = !anyErr;
+  document.getElementById("compare-visitors").innerHTML = renderCompare(results, total);
   document.getElementById("cards").innerHTML = results.map(renderCard).join("");
 }
 
