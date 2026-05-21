@@ -71,11 +71,11 @@
   </div>
 
   <div class="range-toggle" role="tablist" aria-label="Date range">
-    <button data-range="day" class="on">Today</button>
+    <button data-range="all" class="on">All time</button>
+    <button data-range="day">Today</button>
     <button data-range="week">7 days</button>
     <button data-range="month">30 days</button>
     <button data-range="quarter">90 days</button>
-    <button data-range="year">12 months</button>
   </div>
 
   <div class="compare-card">
@@ -101,9 +101,10 @@ const SITES = [
   {code:"singa", name:"Singapore",    pill:"singa", flag:"🇸🇬", path:"/events/singa/", site:"https://fengelh2.github.io/events/singa/"},
 ];
 
-let currentRange = "day";
+let currentRange = "all";
 
 function dateRange(range){
+  if(range==="all") return null;
   const end = new Date();
   const start = new Date();
   if(range==="day"){ /* same day */ }
@@ -120,8 +121,8 @@ function dateRange(range){
 // from client-side JS without leaking the token. The native dashboard at
 // fengelh.goatcounter.com handles those — we link to it.)
 async function fetchCity(site, range){
-  const {start, end} = dateRange(range);
-  const qs = `?start=${start}&end=${end}`;
+  const dr = dateRange(range);
+  const qs = dr ? `?start=${dr.start}&end=${dr.end}` : "";
   // Encode the path with %2F slashes
   const enc = encodeURIComponent(site.path);
   const out = {site, range, error:null, total:null, eventClicks:0};
@@ -139,8 +140,8 @@ async function fetchCity(site, range){
 }
 
 async function fetchTotal(range){
-  const {start, end} = dateRange(range);
-  const qs = `?start=${start}&end=${end}`;
+  const dr = dateRange(range);
+  const qs = dr ? `?start=${dr.start}&end=${dr.end}` : "";
   try {
     const r = await fetch(`${GC}/counter/TOTAL.json${qs}`);
     if(r.ok) return await r.json();
