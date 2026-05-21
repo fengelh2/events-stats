@@ -127,8 +127,10 @@ async function fetchCity(site, range){
   const out = {site, range, error:null, total:null, eventClicks:0};
   try {
     const r = await fetch(`${GC}/counter/${enc}.json${qs}`);
-    if(!r.ok) throw r.status;
-    out.total = await r.json();
+    // GoatCounter returns 404 for never-visited paths but the body still
+    // parses as JSON. Treat 404 + 200 the same; only 403/5xx is a real error.
+    if(r.status >= 500 || r.status === 403) throw r.status;
+    out.total = await r.json().catch(() => ({count:"0", count_unique:"0"}));
     // Event clicks aren't trivially queryable per-city via public API.
     // Aggregate event-click/<city>/* counts require listing paths.
     // Skipped here; user sees them in the native dashboard.
