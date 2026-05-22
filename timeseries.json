@@ -1,23 +1,23 @@
 [
   {
     "date": "2026-05-22",
-    "snapped_at": "2026-05-22T06:12:46+00:00",
+    "snapped_at": "2026-05-22T10:28:06+00:00",
     "total": {
-      "count": 13,
-      "count_unique": 13
+      "count": 17,
+      "count_unique": 17
     },
     "cities": {
       "hk": {
-        "count": 2,
-        "count_unique": 2
+        "count": 4,
+        "count_unique": 4
       },
       "la": {
         "count": 2,
         "count_unique": 2
       },
       "nrw": {
-        "count": 1,
-        "count_unique": 1
+        "count": 2,
+        "count_unique": 2
       },
       "singa": {
         "count": 0,
