@@ -1,15 +1,15 @@
 [
   {
     "date": "2026-05-22",
-    "snapped_at": "2026-05-22T10:28:06+00:00",
+    "snapped_at": "2026-05-22T15:52:08+00:00",
     "total": {
-      "count": 17,
-      "count_unique": 17
+      "count": 18,
+      "count_unique": 18
     },
     "cities": {
       "hk": {
-        "count": 4,
-        "count_unique": 4
+        "count": 5,
+        "count_unique": 5
       },
       "la": {
         "count": 2,
