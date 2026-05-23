@@ -31,15 +31,15 @@
   },
   {
     "date": "2026-05-23",
-    "snapped_at": "2026-05-23T09:08:15+00:00",
+    "snapped_at": "2026-05-23T14:42:21+00:00",
     "total": {
-      "count": 19,
-      "count_unique": 19
+      "count": 22,
+      "count_unique": 22
     },
     "cities": {
       "hk": {
-        "count": 6,
-        "count_unique": 6
+        "count": 7,
+        "count_unique": 7
       },
       "la": {
         "count": 2,
