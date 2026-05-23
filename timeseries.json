@@ -28,5 +28,35 @@
         "count_unique": 0
       }
     }
+  },
+  {
+    "date": "2026-05-23",
+    "snapped_at": "2026-05-23T04:48:56+00:00",
+    "total": {
+      "count": 19,
+      "count_unique": 19
+    },
+    "cities": {
+      "hk": {
+        "count": 6,
+        "count_unique": 6
+      },
+      "la": {
+        "count": 2,
+        "count_unique": 2
+      },
+      "nrw": {
+        "count": 2,
+        "count_unique": 2
+      },
+      "singa": {
+        "count": 0,
+        "count_unique": 0
+      },
+      "fukuoka": {
+        "count": 0,
+        "count_unique": 0
+      }
+    }
   }
 ]
