@@ -24,6 +24,7 @@ SNAPSHOT = REPO_ROOT / "timeseries.json"  # also served as static asset
 GC = "https://fengelh.goatcounter.com"
 CITIES = [
     {"code": "hk",      "path": "/events/hk/"},
+    {"code": "hk-kids", "path": "/events/hk-kids/"},
     {"code": "la",      "path": "/events/la/"},
     {"code": "nrw",     "path": "/events/nrw/"},
     {"code": "singa",   "path": "/events/singa/"},

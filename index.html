@@ -8,7 +8,7 @@
   :root {
     --bg:#fafafa; --fg:#181818; --muted:#666; --card:#fff; --line:#e5e5e5;
     --accent:#0a8a72; --accent-soft:rgba(10,138,114,0.08);
-    --hk:#962d3e; --la:#1f6f8b; --nrw:#b8860b; --singa:#0a8a72; --fukuoka:#bc002d;
+    --hk:#962d3e; --la:#1f6f8b; --nrw:#b8860b; --singa:#0a8a72; --fukuoka:#bc002d; --hk-kids:#ff7849;
   }
   @media (prefers-color-scheme:dark){
     :root {--bg:#161616;--fg:#f5f5f5;--muted:#aaa;--card:#1f1f1f;--line:#333;--accent-soft:rgba(10,138,114,0.18);}
@@ -32,6 +32,7 @@
   .site-pill.nrw{background:var(--nrw)}
   .site-pill.singa{background:var(--singa)}
   .site-pill.fukuoka{background:var(--fukuoka)}
+  .site-pill.hk-kids{background:var(--hk-kids)}
   .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
   .stat{padding:10px;background:var(--accent-soft);border-radius:8px}
   .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px}
@@ -58,6 +59,7 @@
   .compare-row.nrw .compare-bar{background:var(--nrw)}
   .compare-row.singa .compare-bar{background:var(--singa)}
   .compare-row.fukuoka .compare-bar{background:var(--fukuoka)}
+  .compare-row.hk-kids .compare-bar{background:var(--hk-kids)}
   .setup-banner{background:#fff8e1;border:1px solid #f4d03f;color:#7a5a02;padding:14px;border-radius:8px;margin-bottom:24px;font-size:13px}
   .chart svg{display:block;width:100%;height:auto}
   .chart .chart-bar:hover{opacity:0.8;cursor:default}
@@ -128,6 +130,7 @@ const SITES = [
   {code:"nrw",   name:"NRW",          pill:"nrw",   flag:"🇩🇪", path:"/events/nrw/",   site:"https://fengelh2.github.io/events/nrw/"},
   {code:"singa", name:"Singapore",    pill:"singa", flag:"🇸🇬", path:"/events/singa/", site:"https://fengelh2.github.io/events/singa/"},
   {code:"fukuoka", name:"Fukuoka",    pill:"fukuoka", flag:"🇯🇵", path:"/events/fukuoka/", site:"https://fengelh2.github.io/events/fukuoka/"},
+  {code:"hk-kids", name:"HK Kids",    pill:"hk-kids", flag:"👶", path:"/events/hk-kids/", site:"https://fengelh2.github.io/events/hk-kids/"},
 ];
 
 let currentRange = "all";
