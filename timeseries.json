@@ -126,5 +126,39 @@
         "count_unique": 2
       }
     }
+  },
+  {
+    "date": "2026-05-26",
+    "snapped_at": "2026-05-26T05:09:27+00:00",
+    "total": {
+      "count": 44,
+      "count_unique": 44
+    },
+    "cities": {
+      "hk": {
+        "count": 8,
+        "count_unique": 8
+      },
+      "hk-kids": {
+        "count": 1,
+        "count_unique": 1
+      },
+      "la": {
+        "count": 4,
+        "count_unique": 4
+      },
+      "nrw": {
+        "count": 2,
+        "count_unique": 2
+      },
+      "singa": {
+        "count": 0,
+        "count_unique": 0
+      },
+      "fukuoka": {
+        "count": 2,
+        "count_unique": 2
+      }
+    }
   }
 ]
