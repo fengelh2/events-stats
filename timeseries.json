@@ -231,10 +231,10 @@
   },
   {
     "date": "2026-05-29",
-    "snapped_at": "2026-05-29T10:52:19+00:00",
+    "snapped_at": "2026-05-29T16:51:09+00:00",
     "total": {
-      "count": 72,
-      "count_unique": 72
+      "count": 73,
+      "count_unique": 73
     },
     "cities": {
       "hk": {
@@ -246,8 +246,8 @@
         "count_unique": 13
       },
       "la": {
-        "count": 5,
-        "count_unique": 5
+        "count": 6,
+        "count_unique": 6
       },
       "nrw": {
         "count": 2,
