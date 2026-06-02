@@ -230,8 +230,22 @@ function renderCard(d){
 function renderCompare(results, total){
   const data = results.map(r=>({site:r.site, uniq:parseInt((r.total&&r.total.count_unique)||0,10)})).sort((a,b)=>b.uniq-a.uniq);
   const max = Math.max(...data.map(d=>d.uniq), 1);
+  const cityUniqSum = data.reduce((s,d)=>s+d.uniq,0);
   const tot = total ? parseInt(total.count_unique||0,10) : 0;
-  const head = tot > 0 ? `<p class="hint" style="margin-bottom:14px">Total unique visitors across all cities: <strong>${tot.toLocaleString()}</strong></p>` : "";
+  // GoatCounter's TOTAL counts unique visitors site-wide (incl. landing page,
+  // stats dashboard, etc.). Per-city sum can over- OR under-count vs TOTAL
+  // depending on cross-city visits + non-city paths. Show both with a clear
+  // label so the discrepancy is visible.
+  let head = "";
+  if(tot > 0 || cityUniqSum > 0){
+    const gap = tot - cityUniqSum;
+    const gapLabel = gap > 0
+      ? `<span style="color:var(--muted)"> (${gap.toLocaleString()} from landing / stats page)</span>`
+      : gap < 0
+        ? `<span style="color:var(--muted)"> (some visitors viewed multiple cities)</span>`
+        : "";
+    head = `<p class="hint" style="margin-bottom:14px">Per-city sum: <strong>${cityUniqSum.toLocaleString()}</strong> unique${tot > 0 ? ` &middot; Site-wide total: <strong>${tot.toLocaleString()}</strong>${gapLabel}` : ""}</p>`;
+  }
   return head + data.map(d=>`
     <div class="compare-row ${d.site.pill}">
       <div>${d.site.flag} ${escape(d.site.name)}</div>
