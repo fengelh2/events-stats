@@ -809,10 +809,10 @@
   },
   {
     "date": "2026-06-15",
-    "snapped_at": "2026-06-15T06:32:42+00:00",
+    "snapped_at": "2026-06-15T13:23:06+00:00",
     "total": {
-      "count": 96,
-      "count_unique": 96
+      "count": 100,
+      "count_unique": 100
     },
     "cities": {
       "hk": {
@@ -828,8 +828,8 @@
         "count_unique": 6
       },
       "nrw": {
-        "count": 5,
-        "count_unique": 5
+        "count": 6,
+        "count_unique": 6
       },
       "singa": {
         "count": 0,
