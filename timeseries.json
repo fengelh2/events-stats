@@ -1659,19 +1659,19 @@
   },
   {
     "date": "2026-07-10",
-    "snapped_at": "2026-07-10T10:27:17+00:00",
+    "snapped_at": "2026-07-10T15:37:06+00:00",
     "total": {
-      "count": 114,
-      "count_unique": 114
+      "count": 121,
+      "count_unique": 121
     },
     "cities": {
       "hk": {
-        "count": 17,
-        "count_unique": 17
+        "count": 18,
+        "count_unique": 18
       },
       "hk-kids": {
-        "count": 22,
-        "count_unique": 22
+        "count": 23,
+        "count_unique": 23
       },
       "la": {
         "count": 8,
