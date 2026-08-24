@@ -3189,11 +3189,8 @@
   },
   {
     "date": "2026-08-24",
-    "snapped_at": "2026-08-24T02:25:10+00:00",
-    "total": {
-      "count": 131,
-      "count_unique": 131
-    },
+    "snapped_at": "2026-08-24T08:01:00+00:00",
+    "total": null,
     "cities": {
       "hk": {
         "count": 21,
