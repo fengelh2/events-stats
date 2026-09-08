@@ -2,6 +2,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # The Daily snapshot job commits timeseries.json using GITHUB_TOKEN, and
+  # GitHub deliberately does NOT fire `push` for token-authored commits. Pages
+  # therefore last deployed on the final human push (2026-06-11) while the repo
+  # kept accumulating snapshots -- the published chart froze. workflow_run fires
+  # regardless of who authored the commit, so Pages redeploys after each snap.
+  workflow_run:
+    workflows: ["Daily snapshot"]
+    types: [completed]
   workflow_dispatch: {}
 permissions:
   contents: read

@@ -144,7 +144,14 @@ function dateRange(range){
   else if(range==="month")   start.setDate(end.getDate()-29);
   else if(range==="quarter") start.setDate(end.getDate()-89);
   else if(range==="year")    start.setFullYear(end.getFullYear()-1);
-  const iso = d => d.toISOString().slice(0,10);
+  // GoatCounter's /counter end= is EXCLUSIVE. Passing end=today returned an
+  // empty window, so "Today" always read 0 and every other range silently
+  // dropped the current day. Ask for end = tomorrow.
+  end.setDate(end.getDate()+1);
+  // Local calendar date, not toISOString() -- that converts to UTC and shifts
+  // the day boundary for anyone not on UTC.
+  const pad = n => String(n).padStart(2,"0");
+  const iso = d => d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
   return {start:iso(start), end:iso(end)};
 }
 
