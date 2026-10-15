@@ -4957,20 +4957,23 @@
   },
   {
     "date": "2026-10-15",
-    "snapped_at": "2026-10-15T05:46:19+00:00",
-    "total": null,
+    "snapped_at": "2026-10-15T12:35:00+00:00",
+    "total": {
+      "count": 151,
+      "count_unique": 151
+    },
     "cities": {
       "hk": {
-        "count": 0,
-        "count_unique": 0
+        "count": 22,
+        "count_unique": 22
       },
       "hk-kids": {
-        "count": 0,
-        "count_unique": 0
+        "count": 35,
+        "count_unique": 35
       },
       "la": {
-        "count": 0,
-        "count_unique": 0
+        "count": 9,
+        "count_unique": 9
       },
       "nrw": {
         "count": 10,
@@ -4981,8 +4984,8 @@
         "count_unique": 0
       },
       "fukuoka": {
-        "count": 0,
-        "count_unique": 0
+        "count": 4,
+        "count_unique": 4
       }
     }
   }
