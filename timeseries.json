@@ -5399,10 +5399,10 @@
   },
   {
     "date": "2026-10-28",
-    "snapped_at": "2026-10-28T06:46:26+00:00",
+    "snapped_at": "2026-10-28T13:56:25+00:00",
     "total": {
-      "count": 151,
-      "count_unique": 151
+      "count": 152,
+      "count_unique": 152
     },
     "cities": {
       "hk": {
@@ -5422,8 +5422,8 @@
         "count_unique": 10
       },
       "singa": {
-        "count": 0,
-        "count_unique": 0
+        "count": 1,
+        "count_unique": 1
       },
       "fukuoka": {
         "count": 4,
